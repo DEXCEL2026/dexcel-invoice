@@ -2,7 +2,6 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DEXCEL GARAGE – Facture</title>
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
   <style>
@@ -10,235 +9,122 @@
     body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f4f4; padding: 24px; color: #1a1a1a; }
     #invoice-wrapper { max-width: 860px; margin: 0 auto; background: #fff; border-radius: 4px; box-shadow: 0 2px 12px rgba(0,0,0,0.12); overflow: hidden; }
     .inv-header { background: #FFEB00; padding: 28px 36px 20px; display: flex; justify-content: space-between; align-items: flex-start; }
-    .inv-header .brand h1 { font-size: 2.4rem; font-weight: 900; letter-spacing: 3px; color: #000; line-height: 1; }
-    .inv-header .brand p  { font-size: 0.78rem; font-weight: 600; letter-spacing: 2px; color: #333; margin-top: 4px; text-transform: uppercase; }
-    .inv-header .inv-meta { text-align: right; font-size: 0.85rem; color: #111; }
-    .inv-header .inv-meta .inv-title { font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
-    .inv-header .inv-meta span { display: block; line-height: 1.6; }
+    .inv-header .brand h1 { font-size: 2.4rem; font-weight: 900; letter-spacing: 3px; color: #000; }
+    .inv-header .brand p { font-size: 0.78rem; font-weight: 600; color: #333; text-transform: uppercase; }
+    .inv-header .inv-meta { text-align: right; }
+    .inv-header .inv-meta .inv-title { font-size: 1.4rem; font-weight: 800; text-transform: uppercase; }
     .inv-info { display: flex; border-bottom: 3px solid #FFEB00; }
     .inv-info-block { flex: 1; padding: 16px 28px; border-right: 1px solid #eee; }
-    .inv-info-block:last-child { border-right: none; }
-    .inv-info-block h3 { font-size: 0.65rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #999; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid #f0f0f0; }
-    .inv-info-block p  { font-size: 0.88rem; color: #222; line-height: 1.7; font-weight: 600; }
+    .inv-info-block h3 { font-size: 0.65rem; font-weight: 700; color: #999; text-transform: uppercase; margin-bottom: 6px; }
+    .inv-info-block p { font-size: 0.88rem; color: #222; font-weight: 600; }
     .inv-table-wrapper { padding: 24px 36px; }
     table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
     thead tr { background: #1a1a1a; color: #FFEB00; }
-    thead th { padding: 11px 14px; text-align: left; font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
-    thead th.right { text-align: right; }
-    tbody tr:nth-child(odd) { background: #fafafa; }
-    tbody tr:nth-child(even) { background: #fff; }
-    tbody tr:hover { background: #fffde7; }
-    tbody td { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
-    tbody td.right { text-align: right; font-variant-numeric: tabular-nums; }
-    .empty-row td { text-align: center; color: #aaa; font-style: italic; padding: 32px; }
+    thead th { padding: 11px 14px; text-align: left; font-size: 0.72rem; text-transform: uppercase; }
+    tbody td { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; }
+    .right { text-align: right; }
     .inv-totals { padding: 0 36px 24px; display: flex; justify-content: flex-end; }
     .totals-box { min-width: 290px; }
-    .totals-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 0.88rem; border-bottom: 1px solid #f0f0f0; }
-    .totals-row .label { color: #555; }
-    .totals-row .amount { font-variant-numeric: tabular-nums; font-weight: 500; }
-    .totals-row.grand { background: #FFEB00; padding: 10px 14px; border-radius: 3px; border: none; margin-top: 6px; }
-    .totals-row.grand .label  { font-weight: 800; font-size: 0.95rem; color: #000; }
-    .totals-row.grand .amount { font-weight: 900; font-size: 1.05rem; color: #000; }
+    .totals-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #f0f0f0; }
+    .grand { background: #FFEB00; padding: 10px 14px; font-weight: 900; color: #000; margin-top: 6px; }
     .inv-notes { margin: 0 36px 24px; }
-    .inv-notes h4 { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: #888; border-bottom: 2px solid #FFEB00; padding-bottom: 5px; margin-bottom: 8px; letter-spacing: 2px; }
-    .inv-notes .notes-body { background: #fafafa; padding: 14px 16px; border: 1px solid #eee; border-radius: 3px; font-size: 0.88rem; min-height: 50px; white-space: pre-wrap; color: #333; line-height: 1.7; }
-    .inv-notes .notes-body.empty { color: #bbb; font-style: italic; }
-    .inv-cgv { margin: 0 36px 28px; padding: 14px 16px; background: #f8f8f8; border: 1px solid #eee; border-radius: 3px; }
-    .inv-cgv h4 { font-size: 0.65rem; color: #aaa; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
-    .inv-cgv ul { list-style: none; }
-    .inv-cgv li { font-size: 0.72rem; color: #999; line-height: 1.6; padding: 3px 0; border-bottom: 1px dotted #eee; }
-    .inv-cgv li:last-child { border-bottom: none; }
-    .inv-cgv li strong { color: #777; }
-    .inv-footer { background: #1a1a1a; color: #aaa; text-align: center; font-size: 0.72rem; padding: 12px; letter-spacing: 1px; }
+    .inv-notes h4 { font-size: 0.68rem; color: #888; text-transform: uppercase; border-bottom: 2px solid #FFEB00; padding-bottom: 5px; }
+    .notes-body { background: #fafafa; padding: 14px; border: 1px solid #eee; min-height: 50px; font-size: 0.88rem; }
+    .inv-cgv { margin: 0 36px 28px; padding: 14px; background: #f8f8f8; font-size: 0.7rem; color: #999; }
+    .inv-cgv li { border-bottom: 1px dotted #eee; padding: 2px 0; list-style: none; }
+    .inv-footer { background: #1a1a1a; color: #aaa; text-align: center; font-size: 0.72rem; padding: 12px; }
     .inv-footer span { color: #FFEB00; font-weight: 700; }
   </style>
 </head>
 <body>
-
 <div id="invoice-wrapper">
-
   <div class="inv-header">
     <div class="brand"><h1>DEXCEL</h1><p>JLR Specialist Garage</p></div>
     <div class="inv-meta"><div class="inv-title">Facture</div><span id="meta-date"></span></div>
   </div>
-
   <div class="inv-info">
     <div class="inv-info-block"><h3>Client</h3><p id="info-customer">—</p></div>
     <div class="inv-info-block"><h3>Véhicule</h3><p id="info-vehicle">—</p></div>
     <div class="inv-info-block"><h3>Immatriculation</h3><p id="info-plaque">—</p></div>
     <div class="inv-info-block"><h3>Kilométrage</h3><p id="info-mileage">—</p></div>
   </div>
-
   <div class="inv-table-wrapper">
     <table>
-      <thead>
-        <tr>
-          <th style="width:5%">#</th>
-          <th>Description</th>
-          <th class="right" style="width:10%">Qté</th>
-          <th class="right" style="width:16%">P.U. (TND)</th>
-          <th class="right" style="width:16%">Total (TND)</th>
-        </tr>
-      </thead>
-      <tbody id="items-body">
-        <tr class="empty-row"><td colspan="5">Sélectionnez un dossier pour afficher les interventions.</td></tr>
-      </tbody>
+      <thead><tr><th>#</th><th>Description</th><th class="right">Qté</th><th class="right">P.U. (TND)</th><th class="right">Total (TND)</th></tr></thead>
+      <tbody id="items-body"></tbody>
     </table>
   </div>
-
   <div class="inv-totals">
     <div class="totals-box">
-      <div class="totals-row"><span class="label">Sous-total HT</span><span class="amount" id="subtotal">0,000 TND</span></div>
-      <div class="totals-row"><span class="label">TVA (19%)</span><span class="amount" id="tva">0,000 TND</span></div>
-      <div class="totals-row grand"><span class="label">TOTAL TTC</span><span class="amount" id="grand-total">0,000 TND</span></div>
+      <div class="totals-row"><span>Sous-total HT</span><span id="subtotal">0,000 TND</span></div>
+      <div class="totals-row"><span>TVA (19%)</span><span id="tva">0,000 TND</span></div>
+      <div class="totals-row grand"><span>TOTAL TTC</span><span id="grand-total">0,000 TND</span></div>
     </div>
   </div>
-
-  <div class="inv-notes">
-    <h4>Notes / Observations</h4>
-    <div class="notes-body empty" id="notes-body">Aucune observation.</div>
-  </div>
-
+  <div class="inv-notes"><h4>Notes / Observations</h4><div class="notes-body" id="notes-body">Aucune observation.</div></div>
   <div class="inv-cgv">
-    <h4>Conditions Générales de Vente &amp; de Service</h4>
+    <h4>Conditions Générales</h4>
     <ul>
-      <li><strong>Réception :</strong> Travaux effectués selon l'ordre de réparation signé. Responsabilité limitée à la faute lourde prouvée.</li>
-      <li><strong>Devis :</strong> Toute intervention supplémentaire fera l'objet d'un accord complémentaire.</li>
-      <li><strong>Délais :</strong> Délais indicatifs. Non responsable des retards fournisseurs.</li>
-      <li><strong>Objets de Valeur :</strong> Non responsable des objets ou documents laissés dans le véhicule.</li>
-      <li><strong>Paiement :</strong> Comptant à la livraison. Droit de rétention (Art. 308 du COC) appliqué jusqu'au paiement intégral.</li>
-      <li><strong>Frais de Garde :</strong> 20 TND/jour facturés passé 48h après avis de fin de travaux.</li>
-      <li><strong>Litiges :</strong> Compétence exclusive des tribunaux de Ben Arous.</li>
+      <li><strong>Réception:</strong> Travaux effectués selon l'ordre de réparation signé. Responsabilité limitée à la faute lourde prouvée.</li>
+      <li><strong>Devis:</strong> Toute intervention supplémentaire fera l'objet d'un accord complémentaire.</li>
+      <li><strong>Délais:</strong> Délais indicatifs. Non responsable des retards fournisseurs.</li>
+      <li><strong>Valeurs:</strong> Non responsable des objets/documents laissés dans le véhicule.</li>
+      <li><strong>Paiement:</strong> Comptant à la livraison. Droit de rétention (Art. 308 du COC) appliqué.</li>
+      <li><strong>Garde:</strong> 20 TND/jour facturés après 48h de mise à disposition.</li>
+      <li><strong>Litiges:</strong> Compétence exclusive des tribunaux de Ben Arous.</li>
     </ul>
   </div>
-
   <div class="inv-footer"><span>DEXCEL GARAGE</span> · Spécialiste JLR · Radès, Ben Arous, Tunisie</div>
-
 </div>
 
 <script>
-/* ─── UTILITIES ─── */
-function fmt(n) {
-  return (n || 0).toLocaleString('fr-TN', {
-    minimumFractionDigits: 3, maximumFractionDigits: 3
-  }) + ' TND';
-}
-
-/* Safely extract a plain string from any Grist field.
-   Handles: plain string/number, Reference {id,label},
-   broken Reference {tableId,rowId}, null/undefined.      */
-function safe(v) {
-  if (v === null || v === undefined) return '';
-  if (typeof v === 'object') {
-    if (v.label !== undefined && String(v.label).trim() !== '') return String(v.label);
-    if (v.id    !== undefined && !v.tableId)                    return String(v.id);
-    return '';
+  function safe(val) { 
+    if (!val) return ""; 
+    if (typeof val === 'object' && val.label) return val.label;
+    return String(val);
   }
-  return String(v);
-}
+  function fmt(n) { return (n || 0).toLocaleString('fr-TN', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + ' TND'; }
+  document.getElementById('meta-date').textContent = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
 
-function safeNum(v) {
-  var n = parseFloat(safe(v));
-  return isNaN(n) ? 0 : n;
-}
-
-document.getElementById('meta-date').textContent =
-  new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
-
-/* ════════════════════════════════════════════════════════
-   grist.onRecord  — fires from the selected JOBS row.
-   The record IS the Job. Access columns directly.
-   ▸ Adjust the key names below to match your exact
-     JOBS table column IDs if anything still shows "—".
-════════════════════════════════════════════════════════ */
-grist.onRecord(function(record) {
-  if (!record) return;
-
-  /* ── Customer ──────────────────────────────────────── */
-  document.getElementById('info-customer').textContent =
-    safe(record.Customer) || '—';
-
-  /* ── Vehicle ───────────────────────────────────────── */
-  document.getElementById('info-vehicle').textContent =
-    safe(record.Vehicle) || '—';
-
-  /* ── Plaque ────────────────────────────────────────── */
-  document.getElementById('info-plaque').textContent =
-    safe(record.plaque) || '—';
-
-  /* ── Mileage ───────────────────────────────────────── */
-  var km = safeNum(record['Mileage (km)'] || record.Mileage_km || record.Mileage || record.mileage);
-  document.getElementById('info-mileage').textContent =
-    km ? km.toLocaleString('fr-FR') + ' km' : '—';
-
-  /* ── Notes ─────────────────────────────────────────── */
-  var notesEl   = document.getElementById('notes-body');
-  var notesText = safe(record.Notes || record.Fault_Description || record.Observations || '').trim();
-  if (notesText) {
-    notesEl.textContent = notesText;
-    notesEl.classList.remove('empty');
-  } else {
-    notesEl.textContent = 'Aucune observation.';
-    notesEl.classList.add('empty');
-  }
-});
-
-/* ════════════════════════════════════════════════════════
-   grist.onRecords  — fires with linked INTERVENTIONS rows.
-   Builds the line-items table and recalculates totals.
-════════════════════════════════════════════════════════ */
-grist.onRecords(function(records) {
-  var tbody = document.getElementById('items-body');
-  tbody.innerHTML = '';
-
-  if (!records || records.length === 0) {
-    tbody.innerHTML =
-      '<tr class="empty-row"><td colspan="5">Aucune intervention trouvée pour ce dossier.</td></tr>';
-    setTotals(0);
-    return;
-  }
-
-  var subtotal = 0;
-
-  records.forEach(function(rec, idx) {
-    /* ── Description ── try both spellings */
-    var desc = safe(rec.Description || rec.description || rec.Designation || rec.designation || '');
-
-    /* ── Quantité ── try both with and without accent */
-    var qty = safeNum(rec['Quantité'] || rec.Quantite || rec.QTY || rec.qty || 0);
-
-    /* ── Prix Unitaire ── try common column names */
-    var pu = safeNum(rec.Prix_Unitaire || rec['Prix Unitaire'] || rec.PrixUnitaire || rec.Prix || rec.prix || 0);
-
-    var lineTotal = qty * pu;
-    subtotal += lineTotal;
-
-    var tr = document.createElement('tr');
-    tr.innerHTML =
-      '<td>' + (idx + 1) + '</td>' +
-      '<td>' + (desc || '<em style="color:#aaa">—</em>') + '</td>' +
-      '<td class="right">' + qty + '</td>' +
-      '<td class="right">' + pu.toLocaleString('fr-TN', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + '</td>' +
-      '<td class="right">' + lineTotal.toLocaleString('fr-TN', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + '</td>';
-    tbody.appendChild(tr);
+  grist.onRecord(function(record) {
+    if (!record) return;
+    // Tries multiple possible column names to ensure it finds your data
+    document.getElementById('info-customer').textContent = safe(record.Customer || record.Client || record.Name || record.NOM);
+    document.getElementById('info-vehicle').textContent  = safe(record.Vehicle || record.Vehicule || record.Voiture);
+    document.getElementById('info-plaque').textContent   = safe(record.plaque || record.Plaque || record.Immatriculation);
+    
+    let km = record['Mileage (km)'] || record.Mileage || record.Kilometrage || 0;
+    document.getElementById('info-mileage').textContent  = km ? Number(km).toLocaleString('fr-FR') + ' km' : "—";
+    
+    let note = record.Notes || record.Fault_Description || record['Fault Description'] || "";
+    document.getElementById('notes-body').textContent = safe(note) || "Aucune observation.";
   });
 
-  setTotals(subtotal);
-});
+  grist.onRecords(function(records) {
+    const tbody = document.getElementById('items-body');
+    tbody.innerHTML = '';
+    let subtotal = 0;
+    if (!records) return;
 
-function setTotals(subtotal) {
-  var tva   = subtotal * 0.19;
-  var grand = subtotal + tva;
-  document.getElementById('subtotal').textContent    = fmt(subtotal);
-  document.getElementById('tva').textContent         = fmt(tva);
-  document.getElementById('grand-total').textContent = fmt(grand);
-}
+    records.forEach((rec, idx) => {
+      let desc = safe(rec.Description || rec.description || "Intervention");
+      let qty = parseFloat(rec.Quantité || rec.Quantite || rec.qty || 0);
+      let pu = parseFloat(rec.Prix_Unitaire || rec.Prix_unitaire || rec.price || 0);
+      let total = qty * pu;
+      subtotal += total;
 
-/* ════════════════════════════════════════════════════════
-   grist.ready — no columns declared = no sidebar dropdowns.
-   The widget reads directly from the record object.
-════════════════════════════════════════════════════════ */
-grist.ready({ requiredAccess: 'read table' });
+      let tr = document.createElement('tr');
+      tr.innerHTML = `<td>${idx+1}</td><td>${desc}</td><td class="right">${qty}</td><td class="right">${fmt(pu)}</td><td class="right">${fmt(total)}</td>`;
+      tbody.appendChild(tr);
+    });
+
+    let tva = subtotal * 0.19;
+    document.getElementById('subtotal').textContent = fmt(subtotal);
+    document.getElementById('tva').textContent = fmt(tva);
+    document.getElementById('grand-total').textContent = fmt(subtotal + tva);
+  });
+
+  grist.ready({ requiredAccess: 'read table' });
 </script>
 </body>
 </html>
