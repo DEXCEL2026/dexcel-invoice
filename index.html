@@ -7,209 +7,105 @@
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: #f4f4f4;
-      padding: 24px;
-      color: #1a1a1a;
-    }
-
-    #invoice-wrapper {
-      max-width: 860px;
-      margin: 0 auto;
-      background: #fff;
-      border-radius: 4px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
-      overflow: hidden;
-    }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f4f4; padding: 24px; color: #1a1a1a; }
+    #invoice-wrapper { max-width: 860px; margin: 0 auto; background: #fff; border-radius: 4px; box-shadow: 0 2px 12px rgba(0,0,0,0.12); overflow: hidden; }
 
     /* ── HEADER ── */
-    .inv-header {
-      background: #FFEB00;
-      padding: 28px 36px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
+    .inv-header { background: #FFEB00; padding: 28px 36px 20px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .inv-header .brand h1 { font-size: 2.4rem; font-weight: 900; letter-spacing: 3px; color: #000; line-height: 1; }
+    .inv-header .brand p  { font-size: 0.78rem; font-weight: 600; letter-spacing: 2px; color: #333; margin-top: 4px; text-transform: uppercase; }
+    .inv-header .inv-meta { text-align: right; font-size: 0.85rem; color: #111; }
+    .inv-header .inv-meta .inv-title { font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+    .inv-header .inv-meta span { display: block; line-height: 1.6; }
 
-    .inv-header .brand h1 {
-      font-size: 2.4rem;
-      font-weight: 900;
-      letter-spacing: 3px;
-      color: #000;
-      line-height: 1;
-    }
-
-    .inv-header .brand p {
-      font-size: 0.78rem;
-      font-weight: 600;
-      letter-spacing: 2px;
-      color: #333;
-      margin-top: 4px;
-      text-transform: uppercase;
-    }
-
-    .inv-header .inv-meta {
-      text-align: right;
-      font-size: 0.85rem;
-      color: #111;
-    }
-
-    .inv-header .inv-meta .inv-title {
-      font-size: 1.4rem;
-      font-weight: 800;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-
-    .inv-header .inv-meta span {
-      display: block;
-      line-height: 1.6;
-    }
-
-    /* ── CUSTOMER / VEHICLE BLOCK ── */
-    .inv-info {
-      display: flex;
-      gap: 0;
-      border-bottom: 3px solid #FFEB00;
-    }
-
-    .inv-info-block {
-      flex: 1;
-      padding: 18px 36px;
-      border-right: 1px solid #eee;
-    }
-
+    /* ── CLIENT / VEHICLE BAND ── */
+    .inv-info { display: flex; border-bottom: 3px solid #FFEB00; }
+    .inv-info-block { flex: 1; padding: 16px 28px; border-right: 1px solid #eee; }
     .inv-info-block:last-child { border-right: none; }
+    .inv-info-block h3 { font-size: 0.65rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #999; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid #f0f0f0; }
+    .inv-info-block p  { font-size: 0.88rem; color: #222; line-height: 1.7; font-weight: 600; }
 
-    .inv-info-block h3 {
+    /* ── LINE ITEMS TABLE ── */
+    .inv-table-wrapper { padding: 24px 36px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    thead tr { background: #1a1a1a; color: #FFEB00; }
+    thead th { padding: 11px 14px; text-align: left; font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+    thead th.right { text-align: right; }
+    tbody tr:nth-child(odd)  { background: #fafafa; }
+    tbody tr:nth-child(even) { background: #fff; }
+    tbody tr:hover { background: #fffde7; }
+    tbody td { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+    tbody td.right { text-align: right; font-variant-numeric: tabular-nums; }
+    .empty-row td { text-align: center; color: #aaa; font-style: italic; padding: 32px; }
+
+    /* ── TOTALS ── */
+    .inv-totals { padding: 0 36px 24px; display: flex; justify-content: flex-end; }
+    .totals-box { min-width: 290px; }
+    .totals-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 0.88rem; border-bottom: 1px solid #f0f0f0; }
+    .totals-row .label  { color: #555; }
+    .totals-row .amount { font-variant-numeric: tabular-nums; font-weight: 500; }
+    .totals-row.grand   { background: #FFEB00; padding: 10px 14px; border-radius: 3px; border: none; margin-top: 6px; }
+    .totals-row.grand .label  { font-weight: 800; font-size: 0.95rem; color: #000; }
+    .totals-row.grand .amount { font-weight: 900; font-size: 1.05rem; color: #000; }
+
+    /* ── NOTES / OBSERVATIONS ── */
+    .inv-notes { margin: 0 36px 24px; }
+    .inv-notes h4 {
       font-size: 0.68rem;
       font-weight: 700;
       letter-spacing: 2px;
       text-transform: uppercase;
       color: #888;
       margin-bottom: 8px;
-      border-bottom: 1px solid #f0f0f0;
-      padding-bottom: 4px;
+      padding-bottom: 5px;
+      border-bottom: 2px solid #FFEB00;
     }
-
-    .inv-info-block p {
-      font-size: 0.88rem;
-      color: #222;
-      line-height: 1.7;
-    }
-
-    .inv-info-block .val {
-      font-weight: 600;
-    }
-
-    /* ── ITEMS TABLE ── */
-    .inv-table-wrapper {
-      padding: 24px 36px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.88rem;
-    }
-
-    thead tr {
-      background: #1a1a1a;
-      color: #FFEB00;
-    }
-
-    thead th {
-      padding: 11px 14px;
-      text-align: left;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-
-    thead th.right { text-align: right; }
-
-    tbody tr:nth-child(odd)  { background: #fafafa; }
-    tbody tr:nth-child(even) { background: #fff; }
-
-    tbody tr:hover { background: #fffde7; }
-
-    tbody td {
-      padding: 10px 14px;
-      border-bottom: 1px solid #f0f0f0;
-      vertical-align: middle;
-    }
-
-    tbody td.right { text-align: right; font-variant-numeric: tabular-nums; }
-
-    .empty-row td {
-      text-align: center;
-      color: #aaa;
-      font-style: italic;
-      padding: 32px;
-    }
-
-    /* ── TOTALS ── */
-    .inv-totals {
-      padding: 0 36px 28px;
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    .totals-box {
-      min-width: 280px;
-    }
-
-    .totals-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 7px 0;
-      font-size: 0.88rem;
-      border-bottom: 1px solid #f0f0f0;
-    }
-
-    .totals-row .label { color: #555; }
-    .totals-row .amount { font-variant-numeric: tabular-nums; font-weight: 500; }
-
-    .totals-row.grand {
-      background: #FFEB00;
-      padding: 10px 14px;
+    .inv-notes .notes-body {
+      background: #fafafa;
+      border: 1px solid #eee;
       border-radius: 3px;
-      border: none;
-      margin-top: 6px;
+      padding: 14px 16px;
+      font-size: 0.88rem;
+      color: #333;
+      line-height: 1.7;
+      min-height: 56px;
+      white-space: pre-wrap;      /* respects line breaks from Grist text field */
     }
+    .inv-notes .notes-body.empty { color: #bbb; font-style: italic; }
 
-    .totals-row.grand .label  { font-weight: 800; font-size: 0.95rem; color: #000; }
-    .totals-row.grand .amount { font-weight: 900; font-size: 1.05rem; color: #000; }
+    /* ── CONDITIONS GÉNÉRALES ── */
+    .inv-cgv {
+      margin: 0 36px 28px;
+      padding: 14px 16px;
+      background: #f8f8f8;
+      border: 1px solid #eee;
+      border-radius: 3px;
+    }
+    .inv-cgv h4 {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #aaa;
+      margin-bottom: 10px;
+    }
+    .inv-cgv ul { list-style: none; padding: 0; }
+    .inv-cgv ul li {
+      font-size: 0.72rem;
+      color: #999;
+      line-height: 1.6;
+      padding: 3px 0;
+      border-bottom: 1px dotted #eee;
+    }
+    .inv-cgv ul li:last-child { border-bottom: none; }
+    .inv-cgv ul li strong { color: #777; font-weight: 700; }
 
     /* ── FOOTER ── */
-    .inv-footer {
-      background: #1a1a1a;
-      color: #aaa;
-      text-align: center;
-      font-size: 0.72rem;
-      padding: 12px;
-      letter-spacing: 1px;
-    }
-
+    .inv-footer { background: #1a1a1a; color: #aaa; text-align: center; font-size: 0.72rem; padding: 12px; letter-spacing: 1px; }
     .inv-footer span { color: #FFEB00; font-weight: 700; }
 
-    /* ── DEBUG (hidden by default) ── */
-    #debug {
-      display: none;
-      margin-top: 20px;
-      background: #111;
-      color: #0f0;
-      font-family: monospace;
-      font-size: 0.75rem;
-      padding: 12px;
-      border-radius: 4px;
-      white-space: pre-wrap;
-      word-break: break-all;
-    }
+    /* ── DEBUG ── */
+    #debug { display: none; margin-top: 20px; background: #111; color: #0f0; font-family: monospace; font-size: 0.74rem; padding: 12px; border-radius: 4px; white-space: pre-wrap; word-break: break-all; }
   </style>
 </head>
 <body>
@@ -228,27 +124,15 @@
     </div>
   </div>
 
-  <!-- CUSTOMER / VEHICLE INFO -->
+  <!-- CLIENT / VEHICLE BAND -->
   <div class="inv-info">
-    <div class="inv-info-block">
-      <h3>Client</h3>
-      <p id="info-customer">—</p>
-    </div>
-    <div class="inv-info-block">
-      <h3>Véhicule</h3>
-      <p id="info-vehicle">—</p>
-    </div>
-    <div class="inv-info-block">
-      <h3>Immatriculation</h3>
-      <p id="info-plaque" class="val">—</p>
-    </div>
-    <div class="inv-info-block">
-      <h3>Kilométrage</h3>
-      <p id="info-mileage" class="val">—</p>
-    </div>
+    <div class="inv-info-block"><h3>Client</h3><p id="info-customer">—</p></div>
+    <div class="inv-info-block"><h3>Véhicule</h3><p id="info-vehicle">—</p></div>
+    <div class="inv-info-block"><h3>Immatriculation</h3><p id="info-plaque">—</p></div>
+    <div class="inv-info-block"><h3>Kilométrage</h3><p id="info-mileage">—</p></div>
   </div>
 
-  <!-- ITEMS TABLE -->
+  <!-- LINE ITEMS -->
   <div class="inv-table-wrapper">
     <table>
       <thead>
@@ -269,19 +153,30 @@
   <!-- TOTALS -->
   <div class="inv-totals">
     <div class="totals-box">
-      <div class="totals-row">
-        <span class="label">Sous-total HT</span>
-        <span class="amount" id="subtotal">0,000 TND</span>
-      </div>
-      <div class="totals-row">
-        <span class="label">TVA (19%)</span>
-        <span class="amount" id="tva">0,000 TND</span>
-      </div>
-      <div class="totals-row grand">
-        <span class="label">TOTAL TTC</span>
-        <span class="amount" id="grand-total">0,000 TND</span>
-      </div>
+      <div class="totals-row"><span class="label">Sous-total HT</span><span class="amount" id="subtotal">0,000 TND</span></div>
+      <div class="totals-row"><span class="label">TVA (19%)</span><span class="amount" id="tva">0,000 TND</span></div>
+      <div class="totals-row grand"><span class="label">TOTAL TTC</span><span class="amount" id="grand-total">0,000 TND</span></div>
     </div>
+  </div>
+
+  <!-- NOTES / OBSERVATIONS -->
+  <div class="inv-notes">
+    <h4>Notes / Observations</h4>
+    <div class="notes-body empty" id="notes-body">Aucune observation.</div>
+  </div>
+
+  <!-- CONDITIONS GÉNÉRALES -->
+  <div class="inv-cgv">
+    <h4>Conditions Générales de Vente &amp; de Service</h4>
+    <ul>
+      <li><strong>Réception :</strong> Travaux effectués selon l'ordre de réparation signé. Le garage n'est responsable que des dommages résultant d'une faute lourde prouvée.</li>
+      <li><strong>Devis :</strong> Toute intervention supplémentaire non prévue fera l'objet d'un accord complémentaire.</li>
+      <li><strong>Délais :</strong> Les délais sont indicatifs. Le garage n'est pas responsable des retards de livraison des fournisseurs.</li>
+      <li><strong>Objets de Valeur :</strong> Le garage décline toute responsabilité pour les objets ou documents laissés dans le véhicule.</li>
+      <li><strong>Paiement :</strong> Paiement au comptant à la livraison. Le garage exerce son droit de rétention (Art. 308 du COC) jusqu'au paiement intégral.</li>
+      <li><strong>Frais de Garde :</strong> Passé 48h après l'avis de fin de travaux, des frais de garde de 20 TND/jour seront facturés.</li>
+      <li><strong>Litiges :</strong> En cas de contestation, seuls les tribunaux de Ben Arous sont compétents.</li>
+    </ul>
   </div>
 
   <!-- FOOTER -->
@@ -289,217 +184,237 @@
     <span>DEXCEL GARAGE</span> · Spécialiste JLR · Radès, Ben Arous, Tunisie
   </div>
 
-</div>
+</div><!-- /#invoice-wrapper -->
 
-<!-- Debug panel (toggle with ?debug=1 in URL) -->
 <div id="debug"></div>
 
 <script>
-  /* ─────────────────────────────────────────────
-     UTILITIES
-  ───────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════
+   DEBUG  —  append ?debug=1 to the widget URL to activate
+════════════════════════════════════════════════════════════ */
+var DEBUG   = new URLSearchParams(location.search).has('debug');
+var debugEl = document.getElementById('debug');
+if (DEBUG) debugEl.style.display = 'block';
+function log(label, data) {
+  if (!DEBUG) return;
+  debugEl.textContent += '\n[' + label + ']\n' + JSON.stringify(data, null, 2) + '\n';
+}
 
-  const DEBUG = new URLSearchParams(location.search).has('debug');
-  const debugEl = document.getElementById('debug');
-  if (DEBUG) debugEl.style.display = 'block';
+/* ════════════════════════════════════════════════════════════
+   HELPERS
+   ──────────────────────────────────────────────────────────
+   Grist fields arrive in several possible shapes:
 
-  function log(label, data) {
-    if (!DEBUG) return;
-    debugEl.textContent += `\n[${label}]\n${JSON.stringify(data, null, 2)}\n`;
+   Shape A  →  plain value         "Toyota Land Cruiser"
+   Shape B  →  proper Reference    { id: 4, label: "Toyota Land Cruiser" }
+   Shape C  →  broken Reference    { tableId: "JOBS", rowId: 4 }
+               (causes the {"tableId":...} bug — we return '' for this)
+   Shape D  →  null / undefined
+
+   safe()  → always returns a clean string, never a JSON dump
+   num()   → always returns a number (0 for blanks)
+   fmt()   → Tunisian dinar format  "1 234,500 TND"
+════════════════════════════════════════════════════════════ */
+function safe(field) {
+  if (field === null || field === undefined) return '';
+  if (typeof field === 'object') {
+    // Shape B — proper Reference
+    if (field.label !== undefined && String(field.label).trim() !== '')
+      return String(field.label);
+    // Shape B fallback — id only
+    if (field.id !== undefined && !field.tableId)
+      return String(field.id);
+    // Shape C — broken {tableId, rowId} → return empty, never JSON
+    return '';
   }
+  return String(field);
+}
+function num(field) {
+  var v = parseFloat(safe(field));
+  return isNaN(v) ? 0 : v;
+}
+function fmt(n) {
+  return n.toLocaleString('fr-TN', {
+    minimumFractionDigits: 3, maximumFractionDigits: 3
+  }) + ' TND';
+}
 
-  /**
-   * Safely extract a plain value from a Grist field.
-   * Grist Reference columns return objects like { id: 3, label: "Toyota" }
-   * or sometimes just a number (the row id).  Plain columns return primitives.
-   */
-  function val(field) {
-    if (field === null || field === undefined) return '';
-    if (typeof field === 'object') {
-      // Reference cell → prefer .label, fallback .id
-      if (field.label !== undefined) return field.label;
-      if (field.id   !== undefined) return field.id;
-      return JSON.stringify(field);
-    }
-    return field;
-  }
-
-  function num(field) {
-    const v = parseFloat(val(field));
-    return isNaN(v) ? 0 : v;
-  }
-
-  function fmt(n) {
-    return n.toLocaleString('fr-TN', {
-      minimumFractionDigits: 3,
-      maximumFractionDigits: 3
-    }) + ' TND';
-  }
-
-  /* ─────────────────────────────────────────────
-     DATE
-  ───────────────────────────────────────────── */
-  document.getElementById('meta-date').textContent =
-    new Date().toLocaleDateString('fr-FR', {
-      day: '2-digit', month: 'long', year: 'numeric'
-    });
-
-  /* ─────────────────────────────────────────────
-     GRIST COLUMN MAPPING
-     We keep a live copy of whatever columns the
-     sidebar has mapped so we can resolve names.
-  ───────────────────────────────────────────── */
-  let colMapping = null;   // filled by onOptions if user sets mappings
-  let jobRecord  = null;   // the currently selected JOBS row
-
-  /* ─────────────────────────────────────────────
-     1.  LISTEN TO THE SELECTED JOB ROW
-         grist.onRecord fires when the user clicks
-         a row in the JOBS table (the "Select By"
-         source).  We use this for the header info.
-  ───────────────────────────────────────────── */
-  grist.onRecord(function(record, mappings) {
-    log('onRecord (JOB)', record);
-    log('onRecord mappings', mappings);
-    jobRecord = record;
-    renderJobHeader(record, mappings);
+/* ── Today's date ── */
+document.getElementById('meta-date').textContent =
+  new Date().toLocaleDateString('fr-FR', {
+    day: '2-digit', month: 'long', year: 'numeric'
   });
 
-  function renderJobHeader(r, mappings) {
-    if (!r) return;
+/* ════════════════════════════════════════════════════════════
+   grist.onRecord  (SINGULAR)
+   ──────────────────────────────────────────────────────────
+   Fires when the user clicks a row in the JOBS table
+   (the "Select By" source).  This is the ONLY place we
+   populate: Client, Véhicule, Immatriculation, Kilométrage,
+   and the Notes field — all come from the JOBS row.
 
-    // Try mapped names first, then common column names
-    function pick(mapped, ...fallbacks) {
-      if (mapped && r[mapped] !== undefined) return val(r[mapped]);
-      for (const k of fallbacks) {
-        if (r[k] !== undefined) return val(r[k]);
-      }
-      return '—';
+   Resolution order for every field:
+     1.  mappings[widgetColumnName]  → real Grist column ID
+     2.  widgetColumnName used as direct key on the record
+     3.  Common aliases (handles misspellings / old names)
+════════════════════════════════════════════════════════════ */
+grist.onRecord(function(record, mappings) {
+  log('onRecord — raw record', record);
+  log('onRecord — mappings',   mappings);
+
+  if (!record) return;
+  var m = mappings || {};
+
+  /* pick(widgetKey, alias1, alias2, ...)
+     Returns the first resolved value as a safe string.    */
+  function pick(widgetKey) {
+    var aliases = Array.prototype.slice.call(arguments, 1);
+    var mapped  = m[widgetKey];
+    if (mapped  && record[mapped]      !== undefined) return safe(record[mapped]);
+    if (           record[widgetKey]   !== undefined) return safe(record[widgetKey]);
+    for (var i = 0; i < aliases.length; i++) {
+      if (record[aliases[i]] !== undefined) return safe(record[aliases[i]]);
     }
-
-    const m = mappings || {};
-
-    const customer = pick(m.Customer,
-      'Customer','client','Client','NOM','nom','customer');
-
-    const vehicle  = pick(m.Vehicle,
-      'Vehicle','vehicle','Vehicule','vehicule','VEHICLE',
-      'Marque','marque','Model','model');
-
-    const plaque   = pick(m.Plaque,
-      'Plaque','plaque','PLAQUE','Immatriculation','immatriculation');
-
-    const mileage  = pick(m.Mileage,
-      'Mileage','mileage','Kilometrage','kilometrage','KM','km');
-
-    document.getElementById('info-customer').textContent = customer;
-    document.getElementById('info-vehicle').textContent  = vehicle;
-    document.getElementById('info-plaque').textContent   = plaque;
-    document.getElementById('info-mileage').textContent  =
-      mileage !== '—' ? Number(mileage).toLocaleString('fr-FR') + ' km' : '—';
+    return '—';
   }
 
-  /* ─────────────────────────────────────────────
-     2.  LISTEN TO INTERVENTIONS (child records)
-         grist.onRecords fires with ALL rows of the
-         INTERVENTIONS table that are linked to the
-         selected Job.
-  ───────────────────────────────────────────── */
-  grist.onRecords(function(records, mappings) {
-    log('onRecords (INTERVENTIONS) count', records ? records.length : 0);
-    log('onRecords first record', records && records[0]);
-    log('onRecords mappings', mappings);
+  /* pickRaw — same as pick but returns the raw value (for Notes) */
+  function pickRaw(widgetKey) {
+    var aliases = Array.prototype.slice.call(arguments, 1);
+    var mapped  = m[widgetKey];
+    if (mapped  && record[mapped]      !== undefined) return record[mapped];
+    if (           record[widgetKey]   !== undefined) return record[widgetKey];
+    for (var i = 0; i < aliases.length; i++) {
+      if (record[aliases[i]] !== undefined) return record[aliases[i]];
+    }
+    return null;
+  }
 
-    renderItems(records, mappings);
+  /* ── Header fields ── */
+  var customer = pick('Customer',  'customer','Client','client','NOM','nom','Name','name');
+  var vehicle  = pick('Vehicle',   'vehicle','Vehicule','vehicule','Voiture','Marque','marque','Model','model');
+  var plaque   = pick('Plaque',    'plaque','PLAQUE','Immatriculation','immatriculation','Plate','plate');
+  var mileage  = pick('Mileage_km','Mileage','mileage','Kilometrage','kilometrage','KM','km','Km');
+
+  document.getElementById('info-customer').textContent = customer;
+  document.getElementById('info-vehicle').textContent  = vehicle;
+  document.getElementById('info-plaque').textContent   = plaque;
+  document.getElementById('info-mileage').textContent  =
+    (mileage !== '—') ? Number(mileage).toLocaleString('fr-FR') + ' km' : '—';
+
+  /* ── Notes field (from JOBS table) ── */
+  var notesRaw  = pickRaw('Notes', 'notes','NOTES','Observations','observations','Remarques','remarques','Comments','comments');
+  var notesText = safe(notesRaw).trim();
+  var notesEl   = document.getElementById('notes-body');
+  if (notesText) {
+    notesEl.textContent = notesText;
+    notesEl.classList.remove('empty');
+  } else {
+    notesEl.textContent = 'Aucune observation.';
+    notesEl.classList.add('empty');
+  }
+});
+
+/* ════════════════════════════════════════════════════════════
+   grist.onRecords  (PLURAL)
+   ──────────────────────────────────────────────────────────
+   Fires with every INTERVENTIONS row linked to the selected
+   Job.  Builds the line-items table and recalculates totals.
+   This listener NEVER touches the header or notes.
+════════════════════════════════════════════════════════════ */
+grist.onRecords(function(records, mappings) {
+  log('onRecords — count',      records ? records.length : 0);
+  log('onRecords — records[0]', records && records[0]);
+  log('onRecords — mappings',   mappings);
+
+  var tbody = document.getElementById('items-body');
+  tbody.innerHTML = '';
+
+  if (!records || records.length === 0) {
+    tbody.innerHTML =
+      '<tr class="empty-row"><td colspan="5">Aucune intervention trouvée pour ce dossier.</td></tr>';
+    setTotals(0);
+    return;
+  }
+
+  var m = mappings || {};
+
+  function resolve(rec, widgetKey) {
+    var aliases = Array.prototype.slice.call(arguments, 2);
+    var mapped  = m[widgetKey];
+    if (mapped  && rec[mapped]    !== undefined) return rec[mapped];
+    if (           rec[widgetKey] !== undefined) return rec[widgetKey];
+    for (var i = 0; i < aliases.length; i++) {
+      if (rec[aliases[i]] !== undefined) return rec[aliases[i]];
+    }
+    return undefined;
+  }
+
+  var subtotal = 0;
+
+  records.forEach(function(rec, idx) {
+    var desc = safe(resolve(rec, 'Description',
+      'description','DESCRIPTION','Designation','designation','Libelle','libelle','Intervention'));
+
+    var qty  = num(resolve(rec, 'Quantité',
+      'Quantite','quantite','quantité','QTY','qty','Qty','Qte','qte'));
+
+    var pu   = num(resolve(rec, 'Prix_Unitaire',
+      'prix_unitaire','PrixUnitaire','Prix','prix','PU','pu','Price','price','Unit_Price'));
+
+    var lineTotal = qty * pu;
+    subtotal += lineTotal;
+
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td>' + (idx + 1) + '</td>' +
+      '<td>' + (desc || '<em style="color:#aaa">—</em>') + '</td>' +
+      '<td class="right">' + qty + '</td>' +
+      '<td class="right">' +
+        pu.toLocaleString('fr-TN', { minimumFractionDigits:3, maximumFractionDigits:3 }) +
+      '</td>' +
+      '<td class="right">' +
+        lineTotal.toLocaleString('fr-TN', { minimumFractionDigits:3, maximumFractionDigits:3 }) +
+      '</td>';
+    tbody.appendChild(tr);
   });
 
-  function renderItems(records, mappings) {
-    const tbody = document.getElementById('items-body');
-    tbody.innerHTML = '';
+  setTotals(subtotal);
+});
 
-    if (!records || records.length === 0) {
-      tbody.innerHTML =
-        '<tr class="empty-row"><td colspan="5">Aucune intervention trouvée pour ce dossier.</td></tr>';
-      setTotals(0);
-      return;
-    }
+/* ── Totals ── */
+function setTotals(subtotal) {
+  var tva   = subtotal * 0.19;
+  var grand = subtotal + tva;
+  document.getElementById('subtotal').textContent    = fmt(subtotal);
+  document.getElementById('tva').textContent         = fmt(tva);
+  document.getElementById('grand-total').textContent = fmt(grand);
+}
 
-    const m = mappings || {};
+/* ════════════════════════════════════════════════════════════
+   grist.ready
+   ──────────────────────────────────────────────────────────
+   Declares all widget columns.  Type 'Any' tells Grist to
+   accept the field regardless of how the column is typed
+   in the underlying table — safest choice for mixed-type
+   reference and text columns.
+════════════════════════════════════════════════════════════ */
+grist.ready({
+  requiredAccess: 'read table',
+  columns: [
+    /* ── INTERVENTIONS (required) ── */
+    { name: 'Description',   title: 'Description',   type: 'Any' },
+    { name: 'Quantité',      title: 'Quantité',      type: 'Any' },
+    { name: 'Prix_Unitaire', title: 'Prix Unitaire', type: 'Any' },
 
-    /**
-     * resolveField: try the mapped column name, then a list of common aliases.
-     * mappings object keys are the widget-column names you defined in the sidebar.
-     */
-    function resolveField(record, mappedKey, ...aliases) {
-      // 1. Use sidebar mapping if available
-      if (m[mappedKey] && record[m[mappedKey]] !== undefined)
-        return record[m[mappedKey]];
-      // 2. Try the mapped key itself as a column name
-      if (record[mappedKey] !== undefined)
-        return record[mappedKey];
-      // 3. Try aliases
-      for (const a of aliases) {
-        if (record[a] !== undefined) return record[a];
-      }
-      return undefined;
-    }
-
-    let subtotal = 0;
-
-    records.forEach(function(rec, idx) {
-      const desc = val(resolveField(rec, 'Description',
-        'description', 'DESCRIPTION', 'Designation', 'designation',
-        'Libelle', 'libelle', 'Intervention'));
-
-      const qty  = num(resolveField(rec, 'Quantité',
-        'Quantite', 'quantite', 'quantité', 'QTY', 'qty', 'Qty', 'Qte'));
-
-      const pu   = num(resolveField(rec, 'Prix_Unitaire',
-        'prix_unitaire', 'PrixUnitaire', 'Prix', 'prix', 'PU', 'pu',
-        'Unit_Price', 'UnitPrice'));
-
-      const lineTotal = qty * pu;
-      subtotal += lineTotal;
-
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${idx + 1}</td>
-        <td>${desc || '<em style="color:#aaa">—</em>'}</td>
-        <td class="right">${qty}</td>
-        <td class="right">${pu.toLocaleString('fr-TN',{minimumFractionDigits:3,maximumFractionDigits:3})}</td>
-        <td class="right">${lineTotal.toLocaleString('fr-TN',{minimumFractionDigits:3,maximumFractionDigits:3})}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-
-    setTotals(subtotal);
-  }
-
-  function setTotals(subtotal) {
-    const tva   = subtotal * 0.19;
-    const grand = subtotal + tva;
-
-    document.getElementById('subtotal').textContent   = fmt(subtotal);
-    document.getElementById('tva').textContent        = fmt(tva);
-    document.getElementById('grand-total').textContent = fmt(grand);
-  }
-
-  /* ─────────────────────────────────────────────
-     3.  READY
-  ───────────────────────────────────────────── */
-  grist.ready({
-    requiredAccess: 'read table',
-    columns: [
-      { name: 'Description',    title: 'Description',     type: 'Text'   },
-      { name: 'Quantité',       title: 'Quantité',        type: 'Numeric'},
-      { name: 'Prix_Unitaire',  title: 'Prix Unitaire',   type: 'Numeric'},
-      /* Optional – mapped from the JOBS table via onRecord */
-      { name: 'Customer',   title: 'Client',          type: 'Any',  optional: true },
-      { name: 'Vehicle',    title: 'Véhicule',        type: 'Any',  optional: true },
-      { name: 'Plaque',     title: 'Immatriculation', type: 'Any',  optional: true },
-      { name: 'Mileage',    title: 'Kilométrage',     type: 'Any',  optional: true },
-    ]
-  });
+    /* ── JOBS (optional, fed via onRecord) ── */
+    { name: 'Customer',   title: 'Client',          type: 'Any', optional: true },
+    { name: 'Vehicle',    title: 'Véhicule',        type: 'Any', optional: true },
+    { name: 'Plaque',     title: 'Immatriculation', type: 'Any', optional: true },
+    { name: 'Mileage_km', title: 'Kilométrage',     type: 'Any', optional: true },
+    { name: 'Notes',      title: 'Notes',           type: 'Any', optional: true }
+  ]
+});
 </script>
 </body>
 </html>
