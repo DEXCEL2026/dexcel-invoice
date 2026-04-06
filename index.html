@@ -494,10 +494,10 @@
       { name: 'Quantité',       title: 'Quantité',        type: 'Numeric'},
       { name: 'Prix_Unitaire',  title: 'Prix Unitaire',   type: 'Numeric'},
       /* Optional – mapped from the JOBS table via onRecord */
-      { name: 'Customer',       title: 'Client',          type: 'Text',    optional: true },
-      { name: 'Vehicle',        title: 'Véhicule',        type: 'Text',    optional: true },
-      { name: 'Plaque',         title: 'Immatriculation', type: 'Text',    optional: true },
-      { name: 'Mileage',        title: 'Kilométrage',     type: 'Numeric', optional: true },
+      { name: 'Customer',   title: 'Client',          type: 'Any',  optional: true },
+      { name: 'Vehicle',    title: 'Véhicule',        type: 'Any',  optional: true },
+      { name: 'Plaque',     title: 'Immatriculation', type: 'Any',  optional: true },
+      { name: 'Mileage',    title: 'Kilométrage',     type: 'Any',  optional: true },
     ]
   });
 </script>
