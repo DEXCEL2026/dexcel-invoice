@@ -11,8 +11,8 @@
     .inv-header { background: #FFEB00; padding: 28px 36px 20px; display: flex; justify-content: space-between; align-items: flex-start; }
     .inv-header .brand h1 { font-size: 2.4rem; font-weight: 900; letter-spacing: 3px; color: #000; }
     .inv-header .brand p { font-size: 0.78rem; font-weight: 600; color: #333; text-transform: uppercase; }
-    .inv-header .inv-meta { text-align: right; }
-    .inv-header .inv-meta .inv-title { font-size: 1.4rem; font-weight: 800; text-transform: uppercase; }
+    .inv-meta { text-align: right; }
+    .inv-meta .inv-title { font-size: 1.4rem; font-weight: 800; text-transform: uppercase; }
     .inv-info { display: flex; border-bottom: 3px solid #FFEB00; }
     .inv-info-block { flex: 1; padding: 16px 28px; border-right: 1px solid #eee; }
     .inv-info-block h3 { font-size: 0.65rem; font-weight: 700; color: #999; text-transform: uppercase; margin-bottom: 6px; }
@@ -80,36 +80,39 @@
 <script>
   function safe(val) { 
     if (!val) return ""; 
-    if (typeof val === 'object' && val.label) return val.label;
+    if (typeof val === 'object') return val.label || val.Title || val.Name || "";
     return String(val);
   }
   function fmt(n) { return (n || 0).toLocaleString('fr-TN', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + ' TND'; }
   document.getElementById('meta-date').textContent = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
 
+  // ── HEADER (Super Flexible Search) ──
   grist.onRecord(function(record) {
     if (!record) return;
-    // Tries multiple possible column names to ensure it finds your data
-    document.getElementById('info-customer').textContent = safe(record.Customer || record.Client || record.Name || record.NOM);
-    document.getElementById('info-vehicle').textContent  = safe(record.Vehicle || record.Vehicule || record.Voiture);
-    document.getElementById('info-plaque').textContent   = safe(record.plaque || record.Plaque || record.Immatriculation);
+    
+    // Tries EVERY possible way to find the data
+    document.getElementById('info-customer').textContent = safe(record.Customer || record.Title || record.Name || record.Client || "—");
+    document.getElementById('info-vehicle').textContent  = safe(record.Vehicle || record.Vehicule || record.Voiture || "—");
+    document.getElementById('info-plaque').textContent   = safe(record.plaque || record.Plaque || "—");
     
     let km = record['Mileage (km)'] || record.Mileage || record.Kilometrage || 0;
     document.getElementById('info-mileage').textContent  = km ? Number(km).toLocaleString('fr-FR') + ' km' : "—";
     
-    let note = record.Notes || record.Fault_Description || record['Fault Description'] || "";
+    let note = record.Notes || record['Fault Description'] || record.Fault_Description || "";
     document.getElementById('notes-body').textContent = safe(note) || "Aucune observation.";
   });
 
+  // ── TABLE ITEMS ──
   grist.onRecords(function(records) {
     const tbody = document.getElementById('items-body');
     tbody.innerHTML = '';
     let subtotal = 0;
-    if (!records) return;
+    if (!records || records.length === 0) return;
 
     records.forEach((rec, idx) => {
       let desc = safe(rec.Description || rec.description || "Intervention");
-      let qty = parseFloat(rec.Quantité || rec.Quantite || rec.qty || 0);
-      let pu = parseFloat(rec.Prix_Unitaire || rec.Prix_unitaire || rec.price || 0);
+      let qty = parseFloat(rec['Quantité'] || rec.Quantite || rec.qty || 0);
+      let pu = parseFloat(rec['Prix_Unitaire'] || rec.Prix_unitaire || rec.price || 0);
       let total = qty * pu;
       subtotal += total;
 
