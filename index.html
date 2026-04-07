@@ -2,139 +2,97 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>DEXCEL GARAGE – Facture Officielle</title>
+  <title>DEXCEL GARAGE</title>
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f4f4; padding: 24px; color: #1a1a1a; }
-    #invoice-wrapper { max-width: 860px; margin: 0 auto; background: #fff; border-radius: 4px; box-shadow: 0 2px 12px rgba(0,0,0,0.12); overflow: hidden; }
-
-    /* ── HEADER ── */
-    .inv-header { background: #FFEB00; padding: 28px 36px 20px; display: flex; justify-content: space-between; align-items: flex-start; }
-    .inv-header .brand h1 { font-size: 2.4rem; font-weight: 900; letter-spacing: 3px; color: #000; line-height: 1; }
-    .inv-header .brand p  { font-size: 0.78rem; font-weight: 600; letter-spacing: 2px; color: #333; margin-top: 4px; text-transform: uppercase; }
-    .inv-header .inv-meta { text-align: right; font-size: 0.85rem; color: #111; }
-    .inv-header .inv-meta .inv-title { font-size: 1.4rem; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; }
-
-    /* ── INFO BAND ── */
-    .inv-info { display: flex; border-bottom: 3px solid #FFEB00; }
-    .inv-info-block { flex: 1; padding: 16px 28px; border-right: 1px solid #eee; }
-    .inv-info-block:last-child { border-right: none; }
-    .inv-info-block h3 { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: #999; margin-bottom: 6px; border-bottom: 1px solid #f0f0f0; }
-    .inv-info-block p  { font-size: 0.88rem; color: #222; font-weight: 600; }
-
-    /* ── TABLE ── */
-    .inv-table-wrapper { padding: 24px 36px; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f4f4; padding: 20px; color: #1a1a1a; }
+    #invoice-wrapper { max-width: 800px; margin: 0 auto; background: #fff; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }
+    .inv-header { background: #FFEB00; padding: 25px; display: flex; justify-content: space-between; align-items: center; }
+    .inv-header h1 { font-size: 2.2rem; font-weight: 900; color: #000; }
+    .inv-info { display: flex; border-bottom: 3px solid #FFEB00; background: #fff; }
+    .inv-info-block { flex: 1; padding: 15px 20px; border-right: 1px solid #eee; min-height: 70px; }
+    .inv-info-block h3 { font-size: 0.65rem; color: #999; text-transform: uppercase; margin-bottom: 5px; }
+    .inv-info-block p { font-size: 0.9rem; font-weight: 700; color: #222; }
+    .inv-table-wrapper { padding: 20px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
     thead tr { background: #1a1a1a; color: #FFEB00; }
-    thead th { padding: 11px 14px; text-align: left; font-size: 0.72rem; text-transform: uppercase; }
-    thead th.right { text-align: right; }
-    tbody td { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; }
-    tbody td.right { text-align: right; }
-
-    /* ── TOTALS ── */
-    .inv-totals { padding: 0 36px 24px; display: flex; justify-content: flex-end; }
-    .totals-box { min-width: 290px; }
-    .totals-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #f0f0f0; }
-    .totals-row.grand { background: #FFEB00; padding: 10px 14px; border-radius: 3px; margin-top: 6px; font-weight: 900; color: #000; }
-
-    /* ── NOTES ── */
-    .inv-notes { margin: 0 36px 24px; }
-    .inv-notes h4 { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: #888; border-bottom: 2px solid #FFEB00; padding-bottom: 5px; margin-bottom: 8px; }
-    .notes-body { background: #fafafa; padding: 14px; border: 1px solid #eee; min-height: 50px; font-size: 0.88rem; }
-
-    /* ── FOOTER ── */
-    .inv-cgv { margin: 0 36px 28px; padding: 14px; background: #f8f8f8; border: 1px solid #eee; font-size: 0.7rem; color: #999; }
-    .inv-cgv h4 { font-size: 0.65rem; color: #aaa; text-transform: uppercase; margin-bottom: 8px; }
-    .inv-cgv ul { list-style: none; padding: 0; }
-    .inv-cgv li { border-bottom: 1px dotted #eee; padding: 2px 0; }
-    .inv-footer { background: #1a1a1a; color: #aaa; text-align: center; font-size: 0.72rem; padding: 12px; }
-    .inv-footer span { color: #FFEB00; font-weight: 700; }
+    thead th { padding: 10px; text-align: left; text-transform: uppercase; font-size: 0.7rem; }
+    tbody td { padding: 10px; border-bottom: 1px solid #f0f0f0; }
+    .right { text-align: right; }
+    .inv-totals { padding: 20px; display: flex; justify-content: flex-end; }
+    .totals-box { min-width: 250px; }
+    .totals-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
+    .grand { background: #FFEB00; padding: 10px; font-weight: 900; margin-top: 5px; border-bottom: none; }
+    .inv-notes { padding: 20px; border-top: 1px solid #eee; }
+    .notes-body { background: #f9f9f9; padding: 10px; font-size: 0.85rem; border: 1px solid #eee; min-height: 40px; }
   </style>
 </head>
 <body>
-
 <div id="invoice-wrapper">
   <div class="inv-header">
     <div class="brand"><h1>DEXCEL</h1><p>JLR Specialist Garage</p></div>
-    <div class="inv-meta"><div class="inv-title">Facture</div><span id="meta-date"></span></div>
+    <div class="inv-meta"><h2 style="font-weight:800; text-transform:uppercase;">Facture</h2><p id="meta-date"></p></div>
   </div>
-
   <div class="inv-info">
-    <div class="inv-info-block"><h3>Client</h3><p id="info-customer">—</p></div>
-    <div class="inv-info-block"><h3>Véhicule</h3><p id="info-vehicle">—</p></div>
-    <div class="inv-info-block"><h3>Immatriculation</h3><p id="info-plaque">—</p></div>
-    <div class="inv-info-block"><h3>Kilométrage</h3><p id="info-mileage">—</p></div>
+    <div class="inv-info-block"><h3>Client</h3><p id="info-customer">Chargement...</p></div>
+    <div class="inv-info-block"><h3>Véhicule</h3><p id="info-vehicle">Chargement...</p></div>
+    <div class="inv-info-block"><h3>Immatriculation</h3><p id="info-plaque">Chargement...</p></div>
+    <div class="inv-info-block"><h3>Kilométrage</h3><p id="info-mileage">Chargement...</p></div>
   </div>
-
   <div class="inv-table-wrapper">
     <table>
       <thead><tr><th>#</th><th>Description</th><th class="right">Qté</th><th class="right">P.U. (TND)</th><th class="right">Total (TND)</th></tr></thead>
       <tbody id="items-body"></tbody>
     </table>
   </div>
-
   <div class="inv-totals">
     <div class="totals-box">
-      <div class="totals-row"><span>Sous-total HT</span><span id="subtotal">0,000 TND</span></div>
+      <div class="totals-row"><span>Total HT</span><span id="subtotal">0,000 TND</span></div>
       <div class="totals-row"><span>TVA (19%)</span><span id="tva">0,000 TND</span></div>
       <div class="totals-row grand"><span>TOTAL TTC</span><span id="grand-total">0,000 TND</span></div>
     </div>
   </div>
-
-  <div class="inv-notes"><h4>Notes / Observations</h4><div class="notes-body" id="notes-body">Aucune observation.</div></div>
-
-  <div class="inv-cgv">
-    <h4>Conditions Générales</h4>
-    <ul>
-      <li><strong>Réception:</strong> Travaux effectués selon l'ordre de réparation signé. Responsabilité limitée à la faute lourde prouvée.</li>
-      <li><strong>Devis:</strong> Toute intervention supplémentaire fera l'objet d'un accord complémentaire.</li>
-      <li><strong>Délais:</strong> Délais indicatifs. Non responsable des retards fournisseurs.</li>
-      <li><strong>Valeurs:</strong> Non responsable des objets/documents laissés dans le véhicule.</li>
-      <li><strong>Paiement:</strong> Comptant à la livraison. Droit de rétention (Art. 308 du COC) appliqué.</li>
-      <li><strong>Garde:</strong> 20 TND/jour facturés après 48h de mise à disposition.</li>
-      <li><strong>Litiges:</strong> Compétence exclusive des tribunaux de Ben Arous.</li>
-    </ul>
-  </div>
-
-  <div class="inv-footer"><span>DEXCEL GARAGE</span> · Spécialiste JLR · Radès, Ben Arous, Tunisie</div>
+  <div class="inv-notes"><h3>Observations</h3><div class="notes-body" id="notes-body">Aucune observation.</div></div>
 </div>
 
 <script>
-  function safe(val) { 
-    if (!val) return ""; 
-    if (typeof val === 'object' && val.label) return val.label;
+  // This is the MAGIC function that finds the name inside Grist Links
+  function forceName(val) {
+    if (!val) return "—";
+    if (typeof val === 'object') {
+      return val.label || val.Name || val.Title || JSON.stringify(val);
+    }
     return String(val);
   }
-  function fmt(n) { return (n || 0).toLocaleString('fr-TN', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + ' TND'; }
+
+  function fmt(n) { return (n || 0).toLocaleString('fr-TN', { minimumFractionDigits: 3 }) + ' TND'; }
   document.getElementById('meta-date').textContent = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
 
-  // ── HEADER (Data from Jobs Table) ──
   grist.onRecord(function(record) {
     if (!record) return;
-    document.getElementById('info-customer').textContent = safe(record.Customer);
-    document.getElementById('info-vehicle').textContent  = safe(record.Vehicle);
-    document.getElementById('info-plaque').textContent   = safe(record.plaque);
+    // We search every possible variation of the column names
+    document.getElementById('info-customer').textContent = forceName(record.Customer || record.Client || record.Title);
+    document.getElementById('info-vehicle').textContent  = forceName(record.Vehicle || record.Vehicule || record.Model);
+    document.getElementById('info-plaque').textContent   = forceName(record.plaque || record.Plaque || record.Registration);
     
-    // Exact match for 'Mileage (km)' from your screenshot
-    let km = record['Mileage (km)'] || 0;
-    document.getElementById('info-mileage').textContent  = km ? Number(km).toLocaleString('fr-FR') + ' km' : "—";
+    let km = record['Mileage (km)'] || record.Mileage || record.Kilometrage || 0;
+    document.getElementById('info-mileage').textContent = km ? Number(km).toLocaleString('fr-FR') + ' km' : "—";
     
-    // Exact match for 'Fault Description' from your screenshot
-    document.getElementById('notes-body').textContent = safe(record['Fault Description']) || "Aucune observation.";
+    let note = record.Notes || record['Fault Description'] || "";
+    document.getElementById('notes-body').textContent = forceName(note) || "Aucune observation.";
   });
 
-  // ── TABLE (Data from Interventions Table) ──
   grist.onRecords(function(records) {
     const tbody = document.getElementById('items-body');
     tbody.innerHTML = '';
     let subtotal = 0;
-    if (!records) return;
+    if (!records || records.length === 0) return;
 
     records.forEach((rec, idx) => {
-      let desc = safe(rec.Description);
-      let qty = parseFloat(rec['Quantité'] || 0);
-      let pu = parseFloat(rec['Prix_Unitaire'] || 0);
+      let desc = forceName(rec.Description || "Intervention");
+      let qty = parseFloat(rec['Quantité'] || rec.Quantite || 0);
+      let pu = parseFloat(rec['Prix_Unitaire'] || rec.Prix_unitaire || 0);
       let total = qty * pu;
       subtotal += total;
 
